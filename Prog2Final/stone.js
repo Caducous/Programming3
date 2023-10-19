@@ -1,4 +1,6 @@
-class Stone extends LivingCreature {
+let Creature = require('./livingcreature');
+let random = require("./random");
+module.exports = class Stone extends Creature {
     mul() {
         this.multiply++;
         var newCell = random(this.chooseCell(0));
