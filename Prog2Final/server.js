@@ -6,9 +6,10 @@ app.use(express.static("."));
 app.get("/", function (req, res) {
    res.redirect("index.html");
 });
-server.listen(3005, function () {
+server.listen(3002, function () {
    console.log("App is running on port 3000");
 });
+
 
 
 let random = require('./random')
@@ -17,7 +18,8 @@ let GrassEater = require('./grasseater')
 let Killer = require('./killer')
 let Predator = require('./predator')
 let Stone = require('./stone')
-
+let Water = require('./water')
+let events = [];
 
 grassArr = []
 grassEaterArr = []
@@ -89,7 +91,7 @@ function matrixGenerator(size, countGrass, countGrassEater, predatorCount, kille
 }
 
 function setupGame() {
-   matrixGenerator(100, 250, 15, 15, 15, 50)
+   matrixGenerator(100, 250, 20, 20, 20, 20, 20)
    for (var y = 0; y < matrix.length; y++) {
       for (var x = 0; x < matrix.length; x++) {
          if (matrix[y][x] == 1) {
@@ -122,25 +124,25 @@ function playGame() {
    }
    for (var i in grassEaterArr) {
       grassEaterArr[i].eat()
-   }
-   for (var i in grassEaterArr) {
       grassEaterArr[i].mul()
    }
+
    for (var i in predatorArr) {
       predatorArr[i].eat()
-   }
-   for (var i in predatorArr) {
       predatorArr[i].mul()
    }
    for (var i in killerArr) {
       killerArr[i].eat()
-   }
-   for (var i in killerArr) {
       killerArr[i].mul()
    }
    for (var i in stoneArr) {
       stoneArr[i].mul()
    }
+
+   for(let event of events) {
+      event.do();
+   }
+
    io.emit('update matrix', matrix)
 }
 
@@ -148,6 +150,10 @@ io.on('connection',function(socket){
    socket.emit('update matrix', matrix)
    setupGame()
    startPlaying()
+   socket.on("waterfall", function() {
+      events.push(new Water())
+      
+   })
 })
 
 let intervalID;

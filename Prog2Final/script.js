@@ -46,7 +46,7 @@
 
 // ]
 
-
+var is_jrhexex = false;
 var side = 30;
 var sideX = 30;
 var sideY = 30;
@@ -60,11 +60,16 @@ function setup() {
     //     matrix[y].push(Math.round(random(0, 1)))
     // }f
     // }
-    createCanvas(sideX * sideY, sideX * sideY);
+    createCanvas(sideX * sideY + 1, sideX * sideY + 1);
 
 }
-
-
+let jrhexex = document.getElementById("jrhexex")
+jrhexex.addEventListener('click', show_jrhexex)
+function show_jrhexex(){
+    is_jrhexex = !is_jrhexex ;
+    socket.emit("waterfall");
+    console.log('hi');
+}
 // console.log(grassArr);
 // console.log(grassEaterArr);
 
@@ -89,6 +94,12 @@ function drawww(matrix) {
             }
             else if (matrix[y][x] == 5) {
                 fill("brown")
+            }
+            else if (matrix[y][x] == 6) {
+                if (is_jrhexex){
+                    fill("lightblue")
+                }
+                
             }
 
             rect(x * side, y * side, side, side);

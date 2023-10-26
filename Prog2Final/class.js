@@ -12,5 +12,6 @@ module.exports = class Grass extends Creature {
             this.multiply = 10;
         }
     }
+    
 }
 
