@@ -45,7 +45,7 @@
 //     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
 
 // ]
-
+is_Winter = false;
 var is_jrhexex = false;
 var side = 30;
 var sideX = 30;
@@ -68,10 +68,54 @@ jrhexex.addEventListener('click', show_jrhexex)
 function show_jrhexex(){
     is_jrhexex = !is_jrhexex ;
     socket.emit("waterfall");
-    console.log('hi');
 }
 // console.log(grassArr);
 // console.log(grassEaterArr);
+
+
+var data = {}
+
+var p = document.createElement('p')
+document.body.appendChild(p)
+
+function countAllChar(matrix) {
+    var allGrassCount = 0;
+    var allGrassEaterCount = 0;
+
+    for (var y = 0; y < matrix.length; y++) {
+        for (var x = 0; x < matrix[y].length; x++) {
+            if (matrix[y][x] == 1) {
+                allGrassCount++;
+                data.allGrass = allGrassCount
+            }
+            if (matrix[y][x] == 2) {
+                allGrassEaterCount++;
+                data.allGrassEater = allGrassEaterCount
+            }
+        }
+    }
+
+    return data
+}
+
+function showWinter(){
+    is_Winter=true;
+}
+function onWinter(){
+    is_Winter=false;
+}
+let winter = document.getElementById("winter")
+winter.addEventListener('click', showWinter)
+
+let summer = document.getElementById("summer")
+summer.addEventListener('click', onWinter)
+
+socket.emit('winter', is_Winter)
+socket.emit('summer', is_Winter)
+
+
+
+
 
 function drawww(matrix) {
     for (var y = 0; y < matrix.length; y++) {
@@ -79,6 +123,9 @@ function drawww(matrix) {
 
             if (matrix[y][x] == 1) {
                 fill("green");
+                if(is_Winter){
+                    fill("white");
+                }
             }
             else if (matrix[y][x] == 0) {
                 fill("#acacac");
@@ -110,8 +157,21 @@ function drawww(matrix) {
             */
         }
     }
+    socket.emit('Total statistics', countAllChar(matrix))
+    socket.on('display statistics', (data) => {
+        statistics = data
+
+        var updatedText = '';
+        for (var key in statistics) {
+            updatedText += '\n' + key + ' ' + statistics[key];
+        }
+        p.innerText = updatedText;
+
+
+    })
 }
 
 socket.on('update matrix', drawww)
+
 
 

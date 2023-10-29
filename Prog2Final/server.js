@@ -2,11 +2,12 @@ var express = require("express");
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
+var fs = require("fs");
 app.use(express.static("."));
 app.get("/", function (req, res) {
    res.redirect("index.html");
 });
-server.listen(3002, function () {
+server.listen(3000, function () {
    console.log("App is running on port 3000");
 });
 
@@ -27,6 +28,8 @@ predatorArr = []
 killerArr = []
 stoneArr = []
 matrix = []
+winter = false
+summer = false
 
 function matrixGenerator(size, countGrass, countGrassEater, predatorCount, killerCount, StoneCount) {
    for (let i = 0; i < size; i++) {
@@ -124,16 +127,22 @@ function playGame() {
    }
    for (var i in grassEaterArr) {
       grassEaterArr[i].eat()
+   }
+   for (var i in grassEaterArr) {
       grassEaterArr[i].mul()
    }
 
    for (var i in predatorArr) {
       predatorArr[i].eat()
+   }
+   for (var i in predatorArr) {
       predatorArr[i].mul()
    }
    for (var i in killerArr) {
-      killerArr[i].eat()
       killerArr[i].mul()
+   }
+   for (var i in killerArr) {
+      killerArr[i].eat()
    }
    for (var i in stoneArr) {
       stoneArr[i].mul()
@@ -154,12 +163,38 @@ io.on('connection',function(socket){
       events.push(new Water())
       
    })
+   socket.on('winter', (is_Winter) => {
+      winter = is_Winter
+   });
+
+   socket.on('summer',(is_Winter) =>{
+      summer = is_Winter
+   });
 })
 
+
+
+var speed = 1000;
+if(winter){
+   speed = 2000;
+}
+if(summer){
+   speed = 250;
+}
 let intervalID;
 function startPlaying(){
    clearInterval(intervalID);
    intervalID = setInterval(() => {
       playGame()
-   }, 1000);
+   }, speed);
 }
+
+
+io.on('connection', (socket) => {
+   socket.emit('draw matrix', matrix)
+   socket.on('Total statistics', (data) => {
+     fs.writeFileSync('data.json', JSON.stringify(data))
+     socket.emit('display statistics', data)
+   })
+ 
+ })
